@@ -12,7 +12,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
-          java-version: '21'
+          java-version: '19'
       - name: Publish to GitHub Packages
         uses: burrunan/gradle-cache-action@v1
         with:

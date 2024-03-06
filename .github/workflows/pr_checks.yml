@@ -9,7 +9,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
-          java-version: '21'
+          java-version: '19'
       - name: Lint
         uses: burrunan/gradle-cache-action@v1
         with:
@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
-          java-version: '21'
+          java-version: '19'
       - name: Unit Tests
         uses: burrunan/gradle-cache-action@v1
         with:
