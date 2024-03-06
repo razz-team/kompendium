@@ -27,7 +27,7 @@ allprojects {
 subprojects {
   plugins.withType(io.bkbn.sourdough.gradle.library.jvm.LibraryJvmPlugin::class) {
     extensions.configure(io.bkbn.sourdough.gradle.library.jvm.LibraryJvmExtension::class) {
-      githubOrg.set("razz")
+      githubOrg.set("razz-team")
       githubRepo.set("kompendium")
       licenseName.set("MIT License")
       licenseUrl.set("https://mit-license.org")
