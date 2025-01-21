@@ -1,9 +1,5 @@
 package io.bkbn.kompendium.core.fixtures
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
 import io.bkbn.kompendium.enrichment.ApiClass
 import io.bkbn.kompendium.enrichment.ApiInt
 import io.bkbn.kompendium.enrichment.ApiList
@@ -52,7 +48,8 @@ data class AnnotatedTestRequest(
 @Serializable
 data class TestSimpleRequest(
   val a: String,
-  val b: Int
+  val b: Int,
+  val c: Boolean
 )
 
 @Serializable
@@ -118,6 +115,25 @@ data class OneJamma(val a: Int) : SlammaJamma
 data class AnothaJamma(val b: Float) : SlammaJamma
 
 data class InsaneJamma(val c: SlammaJamma) : SlammaJamma
+
+sealed interface ChillaxificationMaximization
+
+@Serializable
+@SerialName("chillax")
+data class Chillax(val a: String) : ChillaxificationMaximization
+
+@Serializable
+@SerialName("maximize")
+data class ToDaMax(val b: Int) : ChillaxificationMaximization
+
+sealed class Gadget(
+  open val title: String,
+  open val description: String
+)
+
+class Gizmo(
+  override val title: String,
+) : Gadget(title, "Just a gizmo")
 
 sealed interface Flibbity<T>
 
@@ -186,9 +202,7 @@ object Nested {
 
 @Serializable
 data class TransientObject(
-  @field:Expose
   val nonTransient: String,
-  @field:JsonIgnore
   @Transient
   val transient: String = "transient"
 )
@@ -202,8 +216,6 @@ data class UnbackedObject(
 
 @Serializable
 data class SerialNameObject(
-  @field:JsonProperty("snake_case_name")
-  @field:SerializedName("snake_case_name")
   @SerialName("snake_case_name")
   val camelCaseName: String
 )
@@ -222,3 +234,8 @@ enum class Color {
 data class ObjectWithEnum(
   val color: Color
 )
+
+@Serializable
+data class SomethingSimilar(val a: String) {
+  val b = "something else"
+}

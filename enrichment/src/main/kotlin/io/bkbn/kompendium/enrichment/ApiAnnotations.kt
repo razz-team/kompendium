@@ -38,28 +38,28 @@ annotation class ApiClass(
   val refId: String
 )
 
-fun ApiString.toEnrichment() = PropertyEnrichment().apply {
+fun ApiString.toEnrichment(id: String) = StringEnrichment(id).apply {
   description = this@toEnrichment.description
   deprecated = this@toEnrichment.deprecated
   maxLength = this@toEnrichment.maxLength
   minLength = this@toEnrichment.minLength
 }
 
-fun ApiInt.toEnrichment() = PropertyEnrichment().apply {
+fun ApiInt.toEnrichment(id: String) = NumberEnrichment(id).apply {
   description = this@toEnrichment.description
   deprecated = this@toEnrichment.deprecated
   maximum = this@toEnrichment.maxValue
   minimum = this@toEnrichment.minValue
 }
 
-fun ApiList.toEnrichment() = PropertyEnrichment().apply {
+fun <T> ApiList.toEnrichment(id: String) = CollectionEnrichment<T>(id).apply {
   description = this@toEnrichment.description
   deprecated = this@toEnrichment.deprecated
   maxItems = this@toEnrichment.maxItems
   minItems = this@toEnrichment.minItems
 }
 
-fun ApiProperty.toEnrichment() = PropertyEnrichment().apply {
+fun <T> ApiProperty.toEnrichment(id: String) = ObjectEnrichment<T>(id).apply {
   description = this@toEnrichment.description
   deprecated = this@toEnrichment.deprecated
 }
