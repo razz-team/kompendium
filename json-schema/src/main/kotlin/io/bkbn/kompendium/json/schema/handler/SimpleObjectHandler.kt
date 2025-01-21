@@ -1,7 +1,12 @@
 package io.bkbn.kompendium.json.schema.handler
 
+import io.bkbn.kompendium.enrichment.ApiInt
+import io.bkbn.kompendium.enrichment.ApiList
+import io.bkbn.kompendium.enrichment.ApiProperty
+import io.bkbn.kompendium.enrichment.ApiString
 import io.bkbn.kompendium.enrichment.Enrichment
 import io.bkbn.kompendium.enrichment.ObjectEnrichment
+import io.bkbn.kompendium.enrichment.toEnrichment
 import io.bkbn.kompendium.json.schema.SchemaConfigurator
 import io.bkbn.kompendium.json.schema.SchemaGenerator
 import io.bkbn.kompendium.json.schema.definition.EnumDefinition
@@ -16,6 +21,7 @@ import io.bkbn.kompendium.json.schema.util.Helpers.getReferenceSlug
 import io.bkbn.kompendium.json.schema.util.Helpers.getSlug
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty1
 import kotlin.reflect.KType
 import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
@@ -44,7 +50,7 @@ object SimpleObjectHandler {
     val props = schemaConfigurator.serializableMemberProperties(clazz)
       .filterNot { it.javaField == null }
       .associate { prop ->
-        val propEnrichment = enrichment?.propertyEnrichment?.get(prop)
+        val propEnrichment = enrichment?.propertyEnrichment?.get(prop) ?: prop.enrichmentFromAnnotation()
 
         val schema = when (prop.needsToInjectGenerics(typeMap)) {
           true -> handleNestedGenerics(typeMap, prop, cache, schemaConfigurator, propEnrichment)
@@ -169,4 +175,25 @@ object SimpleObjectHandler {
   }
 
   private fun JsonSchema.isNullable(): Boolean = this is OneOfDefinition && this.oneOf.any { it is NullableDefinition }
+
+  private fun KProperty1<out Any, *>.enrichmentFromAnnotation(): Enrichment? =
+    listOfNotNull(
+      annotations.apiString(name),
+      annotations.apiInt(name),
+      annotations.apiList(name),
+      annotations.apiProperty(name)
+    )
+      .firstOrNull()
+
+  private fun List<Annotation>.apiString(id: String): Enrichment? = filterIsInstance<ApiString>().firstOrNull()
+    ?.toEnrichment(id)
+
+  private fun List<Annotation>.apiInt(id: String): Enrichment? = filterIsInstance<ApiInt>().firstOrNull()
+    ?.toEnrichment(id)
+
+  private fun List<Annotation>.apiList(id: String): Enrichment? = filterIsInstance<ApiList>().firstOrNull()
+    ?.toEnrichment<Any>(id)
+
+  private fun List<Annotation>.apiProperty(id: String): Enrichment? = filterIsInstance<ApiProperty>().firstOrNull()
+    ?.toEnrichment<Any>(id)
 }

@@ -1,9 +1,5 @@
 package io.bkbn.kompendium.core.fixtures
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
 import io.bkbn.kompendium.enrichment.ApiClass
 import io.bkbn.kompendium.enrichment.ApiInt
 import io.bkbn.kompendium.enrichment.ApiList
@@ -11,8 +7,6 @@ import io.bkbn.kompendium.enrichment.ApiString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.time.Instant
 
 @Serializable
