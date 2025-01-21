@@ -1,6 +1,9 @@
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import com.vanniktech.maven.publish.MavenPublishBasePlugin
 import com.vanniktech.maven.publish.SonatypeHost
 import io.bkbn.sourdough.gradle.library.jvm.LibraryJvmPlugin
 import io.bkbn.sourdough.gradle.library.jvm.LibraryJvmExtension
+import java.net.URI
 
 plugins {
   kotlin("jvm") version "2.1.0" apply false
@@ -10,6 +13,7 @@ plugins {
   id("com.vanniktech.maven.publish") version "0.30.0" apply false
   id("io.bkbn.sourdough.root") version "0.13.1"
   id("org.jetbrains.kotlinx.kover") version "0.9.1"
+  `maven-publish`
 }
 
 dependencies {
@@ -29,6 +33,24 @@ allprojects {
 }
 
 subprojects {
+  apply(plugin = "maven-publish")
+
+  // it requires signing now for non-snapshot versions
+  // for now left as-is, since it doesn't change how we use the library
+  publishing {
+    repositories {
+      maven {
+        name = "GitHubPackages"
+        url = URI.create("https://maven.pkg.github.com/razz-team/kompendium")
+        credentials {
+          username = "ignored"
+          password = System.getenv("GITHUB_TOKEN")
+        }
+      }
+    }
+  }
+
+  // required by the sourdough plugin
   plugins.withType(LibraryJvmPlugin::class) {
     extensions.configure(LibraryJvmExtension::class) {
       githubOrg.set("razz-team")
