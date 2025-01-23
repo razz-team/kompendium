@@ -22,18 +22,18 @@ import kotlin.reflect.full.isSubclassOf
 
 object SchemaGenerator {
 
-  @Suppress("CyclomaticComplexMethod")
+  @Suppress("CyclomaticComplexMethod", "ReturnCount")
   fun fromTypeToSchema(
     type: KType,
     cache: MutableMap<String, JsonSchema>,
     schemaConfigurator: SchemaConfigurator,
     enrichment: Enrichment? = null
   ): JsonSchema {
-    val slug = type.getSlug(enrichment)
+    // check for type-property slug (e.g. String-myString)
+    cache[type.getSlug(enrichment)]?.let { return it }
 
-    cache[slug]?.let {
-      return it
-    }
+    // check for raw type
+    cache[type.getSlug(null)]?.let { return it }
 
     return when (val clazz = type.classifier as KClass<*>) {
       Unit::class -> error(

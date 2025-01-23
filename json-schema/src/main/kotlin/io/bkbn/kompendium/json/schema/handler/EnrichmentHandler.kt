@@ -10,50 +10,62 @@ import io.bkbn.kompendium.enrichment.StringEnrichment
 import io.bkbn.kompendium.json.schema.definition.ArrayDefinition
 import io.bkbn.kompendium.json.schema.definition.JsonSchema
 import io.bkbn.kompendium.json.schema.definition.MapDefinition
+import io.bkbn.kompendium.json.schema.definition.OneOfDefinition
 import io.bkbn.kompendium.json.schema.definition.ReferenceDefinition
 import io.bkbn.kompendium.json.schema.definition.TypeDefinition
 
 object EnrichmentHandler {
 
-  fun Enrichment.applyToSchema(schema: JsonSchema): JsonSchema = when (this) {
-    is BooleanEnrichment -> applyToSchema(schema)
-    is NumberEnrichment -> applyToSchema(schema)
-    is StringEnrichment -> applyToSchema(schema)
-    is CollectionEnrichment<*> -> applyToSchema(schema)
-    is MapEnrichment<*> -> applyToSchema(schema)
-    is ObjectEnrichment<*> -> applyToSchema(schema)
-    else -> error("Incorrect enrichment type for enrichment id: ${this.id}")
+  @Suppress("ReturnCount")
+  fun Enrichment.applyToSchema(schema: JsonSchema): JsonSchema {
+    if (schema is OneOfDefinition) {
+      return schema.copy(deprecated = deprecated, description = description)
+    }
+
+    if (schema is ReferenceDefinition) {
+      return schema.copy(deprecated = deprecated, description = description)
+    }
+
+    return when (this) {
+      is BooleanEnrichment -> applyToSchema(schema)
+      is NumberEnrichment -> applyToSchema(schema)
+      is StringEnrichment -> applyToSchema(schema)
+      is CollectionEnrichment<*> -> applyToSchema(schema)
+      is MapEnrichment<*> -> applyToSchema(schema)
+      is ObjectEnrichment<*> -> applyToSchema(schema)
+      else -> error("Incorrect enrichment type ${schema::class} for enrichment id: ${this.id}")
+    }
   }
 
   private fun ObjectEnrichment<*>.applyToSchema(schema: JsonSchema): JsonSchema = when (schema) {
     is TypeDefinition -> schema.copy(deprecated = deprecated, description = description)
     is ReferenceDefinition -> schema.copy(deprecated = deprecated, description = description)
-    else -> error("Incorrect enrichment type for enrichment id: ${this.id}")
+    else -> error("Incorrect enrichment type ${schema::class} for enrichment id: ${this.id}")
   }
 
   private fun MapEnrichment<*>.applyToSchema(schema: JsonSchema): JsonSchema = when (schema) {
     is MapDefinition -> schema.copyMapEnrichment(this)
-    else -> error("Incorrect enrichment type for enrichment id: ${this.id}")
+    else -> error("Incorrect enrichment type ${schema::class} for enrichment id: ${this.id}")
   }
 
   private fun CollectionEnrichment<*>.applyToSchema(schema: JsonSchema): JsonSchema = when (schema) {
     is ArrayDefinition -> schema.copyArrayEnrichment(this)
-    else -> error("Incorrect enrichment type for enrichment id: ${this.id}")
+    else -> error("Incorrect enrichment type ${schema::class} for enrichment id: ${this.id}")
   }
 
   private fun BooleanEnrichment.applyToSchema(schema: JsonSchema): JsonSchema = when (schema) {
     is TypeDefinition -> schema.copyBooleanEnrichment(this)
-    else -> error("Incorrect enrichment type for enrichment id: ${this.id}")
+    else -> error("Incorrect enrichment type ${schema::class} for enrichment id: ${this.id}")
   }
 
   private fun NumberEnrichment.applyToSchema(schema: JsonSchema): JsonSchema = when (schema) {
     is TypeDefinition -> schema.copyNumberEnrichment(this)
-    else -> error("Incorrect enrichment type for enrichment id: ${this.id}")
+    else -> error("Incorrect enrichment type ${schema::class} for enrichment id: ${this.id}")
   }
 
   private fun StringEnrichment.applyToSchema(schema: JsonSchema): JsonSchema = when (schema) {
     is TypeDefinition -> schema.copyStringEnrichment(this)
-    else -> error("Incorrect enrichment type for enrichment id: ${this.id}")
+    else -> error("Incorrect enrichment type ${schema::class} for enrichment id: ${this.id}")
   }
 
   private fun TypeDefinition.copyBooleanEnrichment(
